@@ -870,7 +870,8 @@ class GKCodeCGYRO(GKCode):
 
                     # Using -1j here to match pyrokinetics frequency convention (-ve is electron direction)
                     complex_moment = (
-                        moment_data[0, :, :, :, :, :] - 1j * moment_data[1, :, :, :, :, :]
+                        moment_data[0, :, :, :, :, :]
+                        - 1j * moment_data[1, :, :, :, :, :]
                     )
                     print(np.shape(complex_moment))
                     moments[imoment, :, :, :, :, :] = np.swapaxes(
