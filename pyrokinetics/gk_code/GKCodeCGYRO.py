@@ -511,6 +511,8 @@ class GKCodeCGYRO(GKCode):
 
         self.load_fields(pyro)
 
+        self.load_moments(pyro)
+
         self.load_fluxes(pyro)
 
         if not pyro.numerics.nonlinear:
@@ -608,6 +610,7 @@ class GKCodeCGYRO(GKCode):
         field = ["phi", "apar", "bpar"]
         field = field[:nfield]
         moment = ["particle", "energy", "momentum"]
+        nmoments = len(moment)
         species = pyro.local_species.names
 
         # Grid sizes
@@ -618,6 +621,7 @@ class GKCodeCGYRO(GKCode):
         gk_output.ntheta = ntheta
         gk_output.nspecies = nspecies
         gk_output.nfield = nfield
+        gk_output.nmoments = nmoments
         gk_output.ntheta_plot = ntheta_plot
         gk_output.ntheta_grid = ntheta_grid
 
@@ -802,6 +806,162 @@ class GKCodeCGYRO(GKCode):
                     fields[ifield, :, :, :, :] = None
 
         data["fields"] = (("field", "theta", "kx", "ky", "time"), fields)
+
+    def load_moments(self, pyro):
+        """
+        Loads 3D moments into GKOutput.data DataSet
+        pyro.gk_output.data['moments'] = moments(moment, theta, kx, ky, time)
+        """
+
+        gk_output = pyro.gk_output
+        data = gk_output.data
+
+        run_directory = pyro.run_directory
+
+        base_file = os.path.join(run_directory, "bin.cgyro.kxky_")
+
+        moments = np.empty(
+            (
+                gk_output.nmoments,
+                gk_output.ntheta,
+                gk_output.nkx,
+                gk_output.nspecies,
+                gk_output.nky,
+                gk_output.ntime,
+            ),
+            dtype=np.complex,
+        )
+
+        moment_appendices = ["n", "e", "v"]
+
+        # Loop through all moments and add moment in if it exists
+        for imoment, moment_appendix in enumerate(moment_appendices):
+
+            moment_file = f"{base_file}{moment_appendix}"
+
+            if os.path.exists(moment_file):
+                raw_moment = self.read_binary_file(moment_file)
+                sliced_moment = raw_moment[
+                    : 2
+                    * gk_output.nkx
+                    * gk_output.ntheta
+                    * gk_output.nspecies
+                    * gk_output.nky
+                    * gk_output.ntime
+                ]
+
+                # Load in non-linear moment
+                if pyro.numerics.nonlinear:
+                    moment_data = (
+                        np.reshape(
+                            sliced_moment,
+                            (
+                                2,
+                                gk_output.nkx,
+                                gk_output.ntheta,
+                                gk_output.nspecies,
+                                gk_output.nky,
+                                gk_output.ntime,
+                            ),
+                            "F",
+                        )
+                        / gk_output.rho_star
+                    )
+
+                    # Using -1j here to match pyrokinetics frequency convention (-ve is electron direction)
+                    complex_moment = (
+                        moment_data[0, :, :, :, :, :] - 1j * moment_data[1, :, :, :, :, :]
+                    )
+                    print(np.shape(complex_moment))
+                    moments[imoment, :, :, :, :, :] = np.swapaxes(
+                        np.reshape(
+                            complex_moment,
+                            (
+                                gk_output.nkx,
+                                gk_output.ntheta,
+                                gk_output.nspecies,
+                                gk_output.nky,
+                                gk_output.ntime,
+                            ),
+                        ),
+                        0,
+                        1,
+                    )
+
+                # Linear convert from kx to ballooning space
+                else:
+                    nradial = pyro.cgyro_input["N_RADIAL"]
+
+                    # If theta_plot != theta_grid get amplitude of moments from binary files
+                    if gk_output.ntheta_plot != gk_output.ntheta_grid:
+                        moment_amplitude = (
+                            np.reshape(
+                                sliced_moment,
+                                (
+                                    2,
+                                    nradial,
+                                    gk_output.ntheta_plot,
+                                    gk_output.nspecies,
+                                    gk_output.nky,
+                                    gk_output.ntime,
+                                ),
+                                "F",
+                            )
+                            / gk_output.rho_star
+                        )
+
+                        middle_kx = int(nradial / 2) + 1
+                        moment_amplitude = moment_amplitude[0, middle_kx, 0, 0, :]
+
+                        moments[imoment, :, 0, 0, :] *= moment_amplitude
+
+                    # If all theta point are there then read in data
+                    else:
+                        moment_data = (
+                            np.reshape(
+                                sliced_moment,
+                                (
+                                    2,
+                                    nradial,
+                                    gk_output.ntheta_plot,
+                                    gk_output.nspecies,
+                                    gk_output.nky,
+                                    gk_output.ntime,
+                                ),
+                                "F",
+                            )
+                            / gk_output.rho_star
+                        )
+
+                        # Using -1j here to match pyrokinetics frequency convention (-ve is electron direction)
+                        complex_moment = (
+                            moment_data[0, :, :, :, :] - 1j * moment_data[1, :, :, :, :]
+                        )
+
+                        # Poisson Sum (no negative in exponent to match frequency convention)
+                        for i_radial in range(nradial):
+                            nx = -nradial // 2 + (i_radial - 1)
+                            complex_moment[i_radial, :, :, :] *= np.exp(
+                                2 * pi * 1j * nx * pyro.local_geometry.q
+                            )
+
+                        moments[imoment, :, :, :, :] = np.reshape(
+                            complex_moment,
+                            (
+                                gk_output.ntheta,
+                                gk_output.nkx,
+                                gk_output.nspecies,
+                                gk_output.nky,
+                                gk_output.ntime,
+                            ),
+                        )
+
+            else:
+                if imoment <= pyro.gk_output.nmoment - 1:
+                    print(f"No moment file for {moment_appendix}")
+                    moments[imoment, :, :, :, :] = None
+
+        data["moments"] = (("moment", "theta", "kx", "ky", "time"), moments)
 
     def load_fluxes(self, pyro):
         """
