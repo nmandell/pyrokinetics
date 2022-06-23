@@ -610,6 +610,7 @@ class GKCodeCGYRO(GKCode):
         field = ["phi", "apar", "bpar"]
         field = field[:nfield]
         moment = ["particle", "energy", "momentum"]
+        moment = ["energy"]
         nmoments = len(moment)
         species = pyro.local_species.names
 
@@ -833,6 +834,7 @@ class GKCodeCGYRO(GKCode):
         )
 
         moment_appendices = ["n", "e", "v"]
+        moment_appendices = ["e"]
 
         # Loop through all moments and add moment in if it exists
         for imoment, moment_appendix in enumerate(moment_appendices):
@@ -873,7 +875,7 @@ class GKCodeCGYRO(GKCode):
                         moment_data[0, :, :, :, :, :]
                         - 1j * moment_data[1, :, :, :, :, :]
                     )
-                    print(np.shape(complex_moment))
+
                     moments[imoment, :, :, :, :, :] = np.swapaxes(
                         np.reshape(
                             complex_moment,
@@ -962,7 +964,7 @@ class GKCodeCGYRO(GKCode):
                     print(f"No moment file for {moment_appendix}")
                     moments[imoment, :, :, :, :] = None
 
-        data["moments"] = (("moment", "theta", "kx", "ky", "time"), moments)
+        data["moments"] = (("moment", "theta", "kx", "species", "ky", "time"), moments)
 
     def load_fluxes(self, pyro):
         """
