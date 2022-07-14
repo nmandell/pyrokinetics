@@ -14,50 +14,53 @@ class GKODS:
     Class representing the OMAS gyrokinetics structure
 
     """
-    def __init__(self, 
-                 pyro: Optional[Pyro] = None,
-                 ods: Optional[dict] = None,
-             ):
-        
+
+    def __init__(
+        self,
+        pyro: Optional[Pyro] = None,
+        ods: Optional[dict] = None,
+    ):
+
         self.ods = imas_structure(latest_imas_version, "gyrokinetics")
-        
-        self.json_map_file =  Path(__file__).parent / "imas_to_pyro.json"
+
+        self.json_map_file = Path(__file__).parent / "imas_to_pyro.json"
 
         with open(self.json_map_file) as f:
             self.pyro_to_ods_dict = json.load(f)
 
         if pyro:
             # FIXME store pyro or pass as argument?
-            #self.pyro = pyro
+            # self.pyro = pyro
             self.map_pyro_to_ods(pyro)
 
-    def map_pyro_to_ods(self, 
-                        pyro: Pyro,
-                    ):
+    def map_pyro_to_ods(
+        self,
+        pyro: Pyro,
+    ):
         for key_1, val_1 in self.pyro_to_ods_dict.items():
-            if key_1 in ['ids_properties']:
+            if key_1 in ["ids_properties"]:
                 continue
 
             for key_2, val_2 in val_1.items():
-                if key_2 in ['library', ':']:
+                if key_2 in ["library", ":"]:
                     continue
 
                 if val_2:
                     self.ods[key_1][key_2] = reduce(getattr, val_2, pyro)
 
-
-    def map_ods_to_pyro(self,
-                    ):
+    def map_ods_to_pyro(
+        self,
+    ):
 
         raise NotImplementedError
 
+    def _pyro_to_ods_key(
+        self,
+    ):
 
-    def _pyro_to_ods_key(self,):
-        
-        data_dict = {"code" : "test"}
+        data_dict = {"code": "test"}
 
         return data_dict
-        
 
 
 def get_from_dict(data_dict, map_list):
