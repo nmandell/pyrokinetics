@@ -339,7 +339,6 @@ class GKInputSTELLA(GKInput):
                 except KeyError:
                     self.data[species_key] = copy(self.data["species_parameters_1"])
                     self.data[species_key]["type"] = "ion"
-                    ]
 
             for key, val in self.pyro_stella_species.items():
                 self.data[species_key][val] = local_species[name][key]

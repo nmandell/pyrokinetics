@@ -40,7 +40,7 @@ class Pyro:
         values are SCENE, JETTO, or TRANSP. If set to None, the file type is inferred
         automatically.
     gk_file : PathLike, default ``None``
-        Filename for a gyrokinetics input file (GS2, GENE, CGYRO). When passed, the
+        Filename for a gyrokinetics input file (GS2, stella, GENE, CGYRO). When passed, the
         attributes 'local_geometry', 'local_species', and 'numerics' are set.
     gk_output_file : PathLike, default ``None``
         Filename or directory name for gyrokinetics output file(s). For GS2, the user
@@ -52,7 +52,7 @@ class Pyro:
         containing 'parameters_0000', 'field_0000' and 'nrg_0000'.
     gk_code : str, default ``None``
         Type of gyrokinetics input file and output file. When set, this will skip file
-        type inference. Possible values are 'GS2', 'CGYRO', or 'GENE'. If set to None,
+        type inference. Possible values are 'GS2', 'stella', 'CGYRO', or 'GENE'. If set to None,
         the file type is inferred automatically. If gk_code is set, but no gk_file is
         provided, the corresponding default template file will be read.
     gk_type : str, default ``None``
@@ -77,6 +77,7 @@ class Pyro:
         gk_code: Optional[str] = None,
         gk_type: Optional[str] = None,  # deprecated, synonym for gk_code
     ):
+
         self.float_format = ""
         self.base_directory = Path(__file__).parent
 
@@ -154,7 +155,7 @@ class Pyro:
     def gk_code(self) -> Union[str, None]:
         """
         The current gyrokinetics context, expressed as a string. This is typically the
-        name of the gyrokinetics code (GS2, CGYRO, GENE, etc). If there is no
+        name of the gyrokinetics code (GS2, stella, CGYRO, GENE, etc). If there is no
         gyrokinetics context (i.e. only global equilibrium or kinetics components exist)
         this is instead None.
 
@@ -663,7 +664,7 @@ class Pyro:
         gk_file : PathLike
             Path to a gyrokinetics input file.
         gk_code : str, default None
-            The type of the gyrokinetics input file, such as 'GS2', 'CGYRO', or 'GENE'.
+            The type of the gyrokinetics input file, such as 'GS2', 'stella', 'CGYRO', or 'GENE'.
             If unset, or set to None, the type will be inferred from gk_file. Default is
             None.
         no_process : List[str], default None
@@ -749,7 +750,7 @@ class Pyro:
         file_name: PathLike
             Path to the new file. If file_name exists, the file will be overwritten.
         gk_code: str, default ``None``
-            The type of the gyrokinetics input file to write, such as 'GS2', 'CGYRO',
+            The type of the gyrokinetics input file to write, such as 'GS2', 'stella', 'CGYRO',
             or 'GENE'. If unset, or set to ``None``, ``self.gk_code`` is used.
         template_file: PathLike, default ``None``
             When writing to a new ``gk_code``, this file will be used to populate the
@@ -1377,6 +1378,23 @@ class Pyro:
         """
         try:
             return self._gk_input_record["GS2"].data
+        except KeyError:
+            return None
+
+    @property
+    def stella_input(self) -> Union[f90nml.Namelist, None]:
+        """
+        Return the raw data from the ``GKInput`` corresponding to the stella context. If it
+        doesn't exist, returns ``None``. Has no setter.
+
+        Returns
+        -------
+        f90nml.Namelist or ``None``
+            Fortran namelist object holding input data for the stella context if it exists,
+            otherwise ``None``.
+        """
+        try:
+            return self._gk_input_record["stella"].data
         except KeyError:
             return None
 

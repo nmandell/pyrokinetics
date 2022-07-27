@@ -1,0 +1,112 @@
+&kt_grids_knobs
+    grid_option = 'range'
+/
+
+&kt_grids_range_parameters
+    naky = 1
+    aky_min = 0.1
+    aky_max = 0.1
+    ntheta0 = 1
+    theta0_min = 0.0
+    theta0_max = 0.0
+/
+
+&zgrid_parameters
+    nzed = 64
+    nperiod = 4
+    boundary_option = 'default'
+/
+
+&geo_knobs
+ geo_option = "miller"
+/
+
+&millergeo_parameters
+    nzed_local = 128
+    shat       = 4.0
+    qinp       = 2.0
+    shift      = 0.0
+    rhoc       = 0.5
+    rgeo       = 3.0
+    rmaj       = 3.0
+    kappa      = 1.0
+    kapprim    = 0.0
+    tri        = 0.0
+    triprim    = 0.0
+    betaprim   = 0.0
+/
+
+&vpamu_grids_parameters
+    nvgrid = 24
+    nmu    = 12
+    vpa_max = 3.0
+/
+
+&physics_flags
+    nonlinear = .false.
+/
+
+&dist_fn_knobs
+    adiabatic_option = 'iphi00=2'
+/
+
+&knobs
+    fphi  = 1.0
+    fapar = 1.0
+    fbpar = 0.0
+    delt  = 0.05
+    nstep = 10000
+    cfl_cushion = 0.9
+/
+
+&parameters
+    zeff = 1.0
+    beta = 0.01
+    rhostar = 0.001
+    vnew_ref = 0.1
+/
+
+&layouts_knobs
+    xyzs_layout = 'yxzs'
+    vms_layout = 'vms'
+/
+
+&species_knobs
+    nspec = 2
+    species_option = 'stella'
+/
+
+&species_parameters_1
+    z = -1.0
+    mass = 2.724e-4
+    dens = 1.0
+    temp = 1.0
+    tprim = 3.0
+    fprim = 1.0
+    type = 'electron'
+/
+
+&species_parameters_2
+    z     = 1.0
+    mass  = 1.0
+    dens  = 1.0
+    temp  = 1.0
+    tprim = 3.0
+    fprim = 1.0
+    type  = 'ion'
+/
+
+&init_g_knobs
+    ginit_option = 'default' !'many'
+    chop_side = .false.
+    phiinit = 1.0e-3
+    restart_file = "example.nc"
+/
+
+&stella_diagnostics_knobs
+    write_omega = .true.
+    write_kspectra = .false.
+    nwrite = 50
+    nsave = 3000
+    save_for_restart = .false.
+/

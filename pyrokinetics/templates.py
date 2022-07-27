@@ -4,11 +4,13 @@ template_dir = Path(__file__).parent / "templates"
 template_dir.resolve()
 
 gk_gs2_template = template_dir / "input.gs2"
+gk_stella_template = template_dir / "input.stella"
 gk_cgyro_template = template_dir / "input.cgyro"
 gk_gene_template = template_dir / "input.gene"
 gk_tglf_template = template_dir / "input.tglf"
 gk_templates = {
     "GS2": gk_gs2_template,
+    "stella": gk_stella_template,
     "CGYRO": gk_cgyro_template,
     "GENE": gk_gene_template,
     "TGLF": gk_tglf_template,
