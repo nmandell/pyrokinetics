@@ -183,11 +183,11 @@ class GKInputSTELLA(GKInput):
             mass = stella_data["mass"]
             # Account for sqrt(2) in vth
             species_data.nu = (
-                stella_data["vnew_ref"]
+                self.data["parameters"]["vnew_ref"]
                 * sqrt2
                 * dens
                 * charge**4
-                / sqrt(mass)
+                / np.sqrt(mass)
                 / temp**1.5
             )
 
