@@ -103,9 +103,9 @@ class GKInputSTELLA(GKInput):
         """
         stella_eq = self.data["geo_knobs"]["geo_option"]
 
-#        local_eq = True
+        #        local_eq = True
         if stella_eq not in ["miller", "local", "default"]:
-#            local_eq = False
+            #            local_eq = False
             raise NotImplementedError(
                 f"stella equilibrium option {stella_eq} not implemented"
             )
