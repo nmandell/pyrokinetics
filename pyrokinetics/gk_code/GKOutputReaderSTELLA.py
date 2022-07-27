@@ -67,7 +67,7 @@ class GKOutputReaderSTELLA(GKOutputReader):
         kx = np.fft.fftshift(raw_data["kx"].data) / sqrt2
 
         # theta coords
-        theta = raw_data["zed"].data
+        zed = raw_data["zed"].data
 
         # vpa coord
         vpa = raw_data["vpa"].data  # new diagnostics
