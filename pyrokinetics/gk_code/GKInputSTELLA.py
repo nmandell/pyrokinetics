@@ -325,7 +325,7 @@ class GKInputSTELLA(GKInput):
         self.data["millergeo_parameters"]["kapprim"] = (
             local_geometry.s_kappa * local_geometry.kappa / local_geometry.rho
         )
-        self.data["miilergeo_parameters"]["tri"] = np.arcsin(local_geometry.delta)
+        self.data["millergeo_parameters"]["tri"] = np.arcsin(local_geometry.delta)
         self.data["millergeo_parameters"]["triprim"] = (
             local_geometry["s_delta"] / local_geometry.rho
         )
