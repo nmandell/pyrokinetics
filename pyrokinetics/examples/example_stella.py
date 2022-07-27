@@ -2,7 +2,7 @@ import pyrokinetics
 
 stella_template = pyrokinetics.template_dir / "input.stella"
 
-#print("This is the stella_template: ", stella_template)
+# print("This is the stella_template: ", stella_template)
 
 pyro = pyrokinetics.Pyro(gk_file=stella_template, gk_code="stella")
 

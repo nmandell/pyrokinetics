@@ -39,10 +39,10 @@ class GKInputSTELLA(GKInput):
         "z": "z",
         "dens": "dens",
         "temp": "temp",
-#        "nu": "vnewk",
+        #        "nu": "vnewk",
         "a_lt": "tprim",
         "a_ln": "fprim",
-#        "a_lv": "uprim",
+        #        "a_lv": "uprim",
     }
 
     def read(self, filename: PathLike) -> Dict[str, Any]:
@@ -110,9 +110,9 @@ class GKInputSTELLA(GKInput):
                 f"stella equilibrium option {stella_eq} not implemented"
             )
 
-#        geotype = self.data["theta_grid_parameters"].get("geotype", 0)
-#        if geotype != 0:
-#            raise NotImplementedError("GS2 Fourier options are not implemented")
+        #        geotype = self.data["theta_grid_parameters"].get("geotype", 0)
+        #        if geotype != 0:
+        #            raise NotImplementedError("GS2 Fourier options are not implemented")
 
         return self.get_local_geometry_miller()
 
@@ -137,7 +137,7 @@ class GKInputSTELLA(GKInput):
         r_geo = self.data["millergeo_parameters"].get("rgeo", miller_data["rmaj"])
 
         beta = self.data["parameters"]["beta"] * (miller_data["rmaj"] / r_geo) ** 2
-        miller_data["beta_prime"] *= -0.5*(miller_data["rmaj"] / r_geo) ** 2
+        miller_data["beta_prime"] *= -0.5 * (miller_data["rmaj"] / r_geo) ** 2
 
         # Assume pref*8pi*1e-7 = 1.0
         # FIXME Is this assumption general enough? Can't we get pref from local_species?
@@ -182,8 +182,15 @@ class GKInputSTELLA(GKInput):
             charge = stella_data["z"]
             mass = stella_data["mass"]
             # Account for sqrt(2) in vth
-            species_data.nu = stella_data["vnew_ref"] * sqrt2 * dens * charge**4 / sqrt(mass) / temp**1.5
-                
+            species_data.nu = (
+                stella_data["vnew_ref"]
+                * sqrt2
+                * dens
+                * charge**4
+                / sqrt(mass)
+                / temp**1.5
+            )
+
             species_data.name = name
 
             # Add individual species data to dictionary of species
@@ -212,7 +219,9 @@ class GKInputSTELLA(GKInput):
         if self.is_linear():
             numerics_data["nky"] = 1
             numerics_data["nkx"] = 1
-            numerics_data["ky"] = self.data["kt_grids_range_parameters"]["aky_min"] / sqrt2
+            numerics_data["ky"] = (
+                self.data["kt_grids_range_parameters"]["aky_min"] / sqrt2
+            )
             numerics_data["kx"] = 0.0
             numerics_data["theta0"] = self.data["kt_grids_range_parameters"].get(
                 "theta0_min", 0.0
@@ -271,9 +280,7 @@ class GKInputSTELLA(GKInput):
 
         # Parallel velocity grid (nvpa = 2 * nvgrid)
         try:
-            numerics_data["nvpa"] = (
-                self.data["vpamu_grids_parameters"]["nvgrid"] * 2
-            )
+            numerics_data["nvpa"] = self.data["vpamu_grids_parameters"]["nvgrid"] * 2
         except KeyError:
             numerics_data["nvpa"] = self.data["vpamu_grids_parameters"]["nvgrid"]
 
@@ -309,7 +316,7 @@ class GKInputSTELLA(GKInput):
             )
 
         # Ensure Miller settings
-        self.data["geo_knobs"]["geo_option"] = 'miller'
+        self.data["geo_knobs"]["geo_option"] = "miller"
 
         # Assign Miller values to input file
         for key, val in self.pyro_stella_miller.items():
@@ -346,7 +353,7 @@ class GKInputSTELLA(GKInput):
             # set the reference collision frequency (electron-electron collisions)
             # NEEDS SORTING OUT
             self.data["parameters"]["vnew_ref"] = local_species[name]["nu"] / sqrt2
-            
+
         # If species are defined calculate beta
         if local_species.nref is not None:
 
