@@ -86,7 +86,7 @@ class GKInputSTELLA(GKInput):
     def is_nonlinear(self) -> bool:
         try:
             is_box = self.data["kt_grids_knobs"]["grid_option"] == "box"
-            is_nonlinear = self.data["physics_flags"]["nonlinear"] == True
+            is_nonlinear = self.data["physics_flags"]["nonlinear"] == ".true."
             return is_box and is_nonlinear
         except KeyError:
             return False
@@ -103,9 +103,9 @@ class GKInputSTELLA(GKInput):
         """
         stella_eq = self.data["geo_knobs"]["geo_option"]
 
-        local_eq = True
+#        local_eq = True
         if stella_eq not in ["miller", "local", "default"]:
-            local_eq = False
+#            local_eq = False
             raise NotImplementedError(
                 f"stella equilibrium option {stella_eq} not implemented"
             )
@@ -269,7 +269,7 @@ class GKInputSTELLA(GKInput):
 
             try:
                 numerics_data["nonlinear"] = (
-                    self.data["physics_flags"]["nonlinear"] == True
+                    self.data["physics_flags"]["nonlinear"] == ".true."
                 )
             except KeyError:
                 numerics_data["nonlinear"] = False
@@ -431,9 +431,9 @@ class GKInputSTELLA(GKInput):
             if "physics_flags" not in self.data.keys():
                 self.data["physics_flags"] = {}
 
-            self.data["physics_flags"]["nonlinear"] = True
+            self.data["physics_flags"]["nonlinear"] = ".true."
         else:
             try:
-                self.data["physics_flags"]["nonlinear"] = False
+                self.data["physics_flags"]["nonlinear"] = ".false."
             except KeyError:
                 pass
