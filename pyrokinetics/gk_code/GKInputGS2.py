@@ -480,7 +480,10 @@ class GKInputGS2(GKInput):
             self.data["kt_grids_box_parameters"]["y0"] = -numerics.ky * sqrt2
 
             # Currently forces NL sims to have nperiod = 1
-            self.data["theta_grid_parameters"]["nperiod"] = 1
+            if numerics.nonlinear:
+                self.data["theta_grid_parameters"]["nperiod"] = 1
+            else:
+                self.data["theta_grid_parameters"]["nperiod"] = numerics.nperiod
 
             shat = local_geometry.shat
             if abs(shat) < 1e-6:
