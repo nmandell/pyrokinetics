@@ -261,7 +261,7 @@ class GKInputGS2(GKInput):
             grid_data["nky"] = int((box["ny"] - 1) / 3 + 1)
         elif "n0" in keys:
             grid_data["nky"] = box["n0"]
-        elif "nky" in keys:
+        elif "naky" in keys:
             grid_data["nky"] = box["naky"]
         else:
             raise RuntimeError(f"ky grid details not found in {keys}")
@@ -276,7 +276,7 @@ class GKInputGS2(GKInput):
 
         if "nx" in keys:
             grid_data["nkx"] = int((2 * box["nx"] - 1) / 3 + 1)
-        elif "ntheta0" in keys():
+        elif "ntheta0" in keys:
             grid_data["nkx"] = int((2 * box["ntheta0"] - 1) / 3 + 1)
         else:
             raise RuntimeError("kx grid details not found in {keys}")
